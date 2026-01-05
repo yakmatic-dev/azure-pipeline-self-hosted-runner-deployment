@@ -50,4 +50,20 @@ The agent persists between pipeline runs
 
  ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/3a463133b2e85320197081937f5915c29f65dcd0/images/3.jpeg)
 
+ ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/45c0599cf5e6aca991bc1572936fce6a81dc1aac/images/4.jpeg)
+
+
+ The url from the azure web app
+ ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/45c0599cf5e6aca991bc1572936fce6a81dc1aac/images/5.jpeg)
+
+ Right now, your Deploy stage will run automatically if Build succeeds.
+
+To add an approval gateway, you must configure it in the Environment UI .
+
+Contact
+
+For questions, feedback:
+
+Yakub Ilyas
+📧 Email: yakubiliyas12@gmail.com
 
