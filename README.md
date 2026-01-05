@@ -37,3 +37,5 @@ Azure App Service (Linux, Java 17)
 
  ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/7190ce93b39e317e03f4f26bcc053593c4d717b1/images/1.jpeg)
 
+  ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/8925ee43574607018bfe8ed64c87d557e0049d02/images/1a.jpeg)
+
