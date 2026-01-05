@@ -33,4 +33,7 @@ Deploy Stage
      ↓
 Azure App Service (Linux, Java 17)
 ```
+3. The agent is registered in the SelfHostedLinux agent pool and is used for both Build and Deploy stages.
+
+ ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/7190ce93b39e317e03f4f26bcc053593c4d717b1/images/1.jpeg)
 
