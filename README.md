@@ -14,3 +14,19 @@ Full control over runtime tooling
 Artifact-based deployment
 
 Production-grade release flow
+
+2. High-Level Architecture
+CI/CD Flow
+Git Push (main)
+     ↓
+Azure DevOps Pipeline
+     ↓
+Self-Hosted Linux Agent
+     ↓
+Build Stage (Java 17, Maven)
+     ↓
+Pipeline Artifact (JAR)
+     ↓
+Deploy Stage
+     ↓
+Azure App Service (Linux, Java 17)
