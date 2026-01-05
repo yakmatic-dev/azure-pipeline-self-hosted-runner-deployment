@@ -18,6 +18,7 @@ Production-grade release flow
 2. High-Level Architecture
 CI/CD Flow
 
+```text
 Git Push (main)
      ↓
 Azure DevOps Pipeline
@@ -31,4 +32,5 @@ Pipeline Artifact (JAR)
 Deploy Stage
      ↓
 Azure App Service (Linux, Java 17)
+```
 
