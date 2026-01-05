@@ -1,0 +1,89 @@
+
+trigger:
+  branches:
+    include:
+      - test
+
+stages:
+
+# =====================
+# STAGE 1: BUILD
+# =====================
+- stage: Build
+  displayName: "Build Spring Boot Application"
+  jobs:
+    - job: BuildJob
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+        # Ensure Java 11 is installed
+        - task: JavaToolInstaller@1
+          inputs:
+            versionSpec: '11'
+            jdkArchitectureOption: 'x64'
+            jdkSourceOption: 'PreInstalled'
+
+        # Cache Maven dependencies
+        - task: Cache@2
+          inputs:
+            key: 'maven | "$(Agent.OS)" | **/pom.xml'
+            restoreKeys: |
+              maven | "$(Agent.OS)"
+            path: $(HOME)/.m2/repository
+          displayName: "Cache Maven Dependencies"
+
+        # Make Maven wrapper executable
+        - script: chmod +x ./mvnw
+          displayName: "Make mvnw executable"
+
+        # Build Spring Boot app (skip tests)
+        - script: ./mvnw clean package -DskipTests
+          displayName: "Build with Maven Wrapper"
+
+        # Collect only final executable JAR
+        - script: |
+            mkdir artifact
+            cp target/*.jar artifact/
+            rm -f artifact/*original.jar
+          displayName: "Collect final JAR"
+
+        # Publish artifact for next stage
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: 'artifact'
+            artifact: 'springboot-app'
+            publishLocation: 'pipeline'
+          displayName: "Publish Artifact to Pipeline"
+
+# =====================
+# STAGE 2: DEPLOY
+# =====================
+- stage: Deploy
+  displayName: "Deploy to Azure App Service"
+  dependsOn: Build
+  jobs:
+    - deployment: DeployJob
+      displayName: "Deploy Spring Boot App"
+      environment: 'test'  # Azure DevOps environment name
+      pool:
+        vmImage: 'ubuntu-latest'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              # Download the artifact from build stage
+              - task: DownloadPipelineArtifact@2
+                inputs:
+                  artifact: 'springboot-app'
+                  path: '$(Pipeline.Workspace)/artifact'
+                displayName: "Download Build Artifact"
+
+              # Deploy to Azure App Service
+              - task: AzureWebApp@1
+                inputs:
+                  azureSubscription: '<Azure Service Connection Name>'
+                  appType: 'webAppLinux'
+                  appName: '<Your App Service Name>'
+                  package: '$(Pipeline.Workspace)/artifact/*.jar'
+                  runtimeStack: 'JAVA|11-java11'
+                displayName: "Deploy JAR to Azure App Service"
