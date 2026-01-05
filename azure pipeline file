@@ -1,89 +1,75 @@
-
 trigger:
   branches:
     include:
-      - test
+      - main
+
+pool:
+  name: 'SelfHostedLinux'
+
+variables:
+  azureSubscription: 'azure-prod-connection'
+  webAppName: 'petclinic1'
+  artifactName: 'spring-boot-app'
 
 stages:
-
 # =====================
-# STAGE 1: BUILD
+# BUILD STAGE
 # =====================
 - stage: Build
-  displayName: "Build Spring Boot Application"
+  displayName: 'Build Stage'
   jobs:
     - job: BuildJob
-      pool:
-        vmImage: 'ubuntu-latest'
+      displayName: 'Build Spring Boot Application'
       steps:
-        # Ensure Java 11 is installed
-        - task: JavaToolInstaller@1
-          inputs:
-            versionSpec: '11'
-            jdkArchitectureOption: 'x64'
-            jdkSourceOption: 'PreInstalled'
-
-        # Cache Maven dependencies
-        - task: Cache@2
-          inputs:
-            key: 'maven | "$(Agent.OS)" | **/pom.xml'
-            restoreKeys: |
-              maven | "$(Agent.OS)"
-            path: $(HOME)/.m2/repository
-          displayName: "Cache Maven Dependencies"
-
-        # Make Maven wrapper executable
-        - script: chmod +x ./mvnw
-          displayName: "Make mvnw executable"
-
-        # Build Spring Boot app (skip tests)
-        - script: ./mvnw clean package -DskipTests
-          displayName: "Build with Maven Wrapper"
-
-        # Collect only final executable JAR
         - script: |
-            mkdir artifact
-            cp target/*.jar artifact/
-            rm -f artifact/*original.jar
-          displayName: "Collect final JAR"
+            echo "Java version:"
+            java -version
+            echo "Maven version:"
+            mvn -version
+            mvn -U clean package -DskipTests -Dspring-javaformat.skip=true
 
-        # Publish artifact for next stage
+          displayName: 'Build with Maven (System Java 17)'
+
+        - script: |
+            mkdir -p $(Build.ArtifactStagingDirectory)
+            cp target/*.jar $(Build.ArtifactStagingDirectory)
+            rm -f $(Build.ArtifactStagingDirectory)/*original.jar
+          displayName: 'Collect JAR'
+
         - task: PublishPipelineArtifact@1
+          displayName: 'Publish Artifact'
           inputs:
-            targetPath: 'artifact'
-            artifact: 'springboot-app'
-            publishLocation: 'pipeline'
-          displayName: "Publish Artifact to Pipeline"
+            targetPath: '$(Build.ArtifactStagingDirectory)'
+            artifact: '$(artifactName)'
 
 # =====================
-# STAGE 2: DEPLOY
+# DEPLOY STAGE
 # =====================
 - stage: Deploy
-  displayName: "Deploy to Azure App Service"
+  displayName: 'Deploy Stage'
   dependsOn: Build
+  condition: succeeded()
   jobs:
     - deployment: DeployJob
-      displayName: "Deploy Spring Boot App"
-      environment: 'test'  # Azure DevOps environment name
+      displayName: 'Deploy to Azure Web App'
+      environment: 'test'
       pool:
-        vmImage: 'ubuntu-latest'
+        name: 'SelfHostedLinux'
       strategy:
         runOnce:
           deploy:
             steps:
-              # Download the artifact from build stage
               - task: DownloadPipelineArtifact@2
+                displayName: 'Download Artifact'
                 inputs:
-                  artifact: 'springboot-app'
+                  artifact: '$(artifactName)'
                   path: '$(Pipeline.Workspace)/artifact'
-                displayName: "Download Build Artifact"
 
-              # Deploy to Azure App Service
               - task: AzureWebApp@1
+                displayName: 'Deploy to Azure Web App'
                 inputs:
-                  azureSubscription: '<Azure Service Connection Name>'
+                  azureSubscription: '$(azureSubscription)'
                   appType: 'webAppLinux'
-                  appName: '<Your App Service Name>'
+                  appName: '$(webAppName)'
                   package: '$(Pipeline.Workspace)/artifact/*.jar'
-                  runtimeStack: 'JAVA|11-java11'
-                displayName: "Deploy JAR to Azure App Service"
+                  runtimeStack: 'JAVA|17-java17'
