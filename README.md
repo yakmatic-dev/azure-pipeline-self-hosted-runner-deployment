@@ -39,3 +39,15 @@ Azure App Service (Linux, Java 17)
 
   ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/8925ee43574607018bfe8ed64c87d557e0049d02/images/1a.jpeg)
 
+This pipeline runs on a self-hosted Linux agent,:
+
+The agent machine is provisioned and managed by the team
+
+Tools must be pre-installed
+
+The agent persists between pipeline runs
+ ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/3a463133b2e85320197081937f5915c29f65dcd0/images/2.jpeg)
+
+ ![image alt](https://github.com/yakmatic-dev/azure-pipeline-self-hosted-runner-deployment/blob/3a463133b2e85320197081937f5915c29f65dcd0/images/3.jpeg)
+
+
