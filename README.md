@@ -1,7 +1,16 @@
 # azure-pipeline-self-hosted-runner-deployment
-Azure DevOps CI/CD Pipeline for Spring Boot (Build & Deploy to Azure)
-📌 Overview
+Azure DevOps CI/CD Pipeline – Spring Boot (Self-Hosted Linux Agent)
+1. Overview
 
-This repository contains an Azure DevOps multi-stage CI/CD pipeline that automatically builds and deploys a Spring Boot application to Azure App Service (Linux) when code is pushed to the test branch.
+This repository implements a two-stage Azure DevOps CI/CD pipeline for building and deploying a Spring Boot application using a self-hosted Linux agent.
+The pipeline is triggered by changes to the main branch and deploys the application as an executable JAR to Azure App Service (Linux) running Java 17.
 
-The pipeline follows a clean Build → Artifact → Deploy workflow, ensuring reliable, repeatable deployments.
+The design prioritizes:
+
+Deterministic build environments
+
+Full control over runtime tooling
+
+Artifact-based deployment
+
+Production-grade release flow
